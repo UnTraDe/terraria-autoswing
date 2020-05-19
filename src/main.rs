@@ -212,29 +212,35 @@ fn nop_memory(process: HANDLE, addr: *mut c_void, size: usize) {
 
 fn main() {
 	let process_name = "Terraria.exe";
-	let process_id = find_process_id_by_name(process_name).expect(format!("did not find process with name {}", process_name).as_str());
-	println!("found process id {}", process_id);
-	
-	let pattern = [0x80, 0xBE, 0x52, 0x01, 0x00, 0x00, 0x00];
 
-	unsafe {
-		let process = processthreadsapi::OpenProcess(winnt::PROCESS_ALL_ACCESS, false as BOOL, process_id);
-		
-		//println!("proc handle = {}", process_handle as u32);
-		//let info = get_module_info(process, process_name).unwrap();
-		//println!("lpBaseOfDll: {:#X}, SizeOfImage: {:#X}, EntryPoint: {:#X}", info.lpBaseOfDll as u64, info.SizeOfImage, info.EntryPoint as u64);
+	if let Some(process_id) = find_process_id_by_name(process_name) {
+		println!("found process id {}", process_id);
 
-		println!("scanning...");
-		//scan_pattern(process, info.lpBaseOfDll, info.SizeOfImage as usize, &pattern);
-		if let Some(addr) = scan_pattern(process, 0 as *const c_void, 0x7fffffffffffffff, &pattern) {
-			println!("pattern found, nopping...");
-			nop_memory(process, addr as *mut c_void, pattern.len());
-		} else {
-			println!("pattern was not found");
+		let pattern = [0x80, 0xBE, 0x52, 0x01, 0x00, 0x00, 0x00];
+
+		unsafe {
+			let process = processthreadsapi::OpenProcess(winnt::PROCESS_ALL_ACCESS, false as BOOL, process_id);
+			
+			//println!("proc handle = {}", process_handle as u32);
+			//let info = get_module_info(process, process_name).unwrap();
+			//println!("lpBaseOfDll: {:#X}, SizeOfImage: {:#X}, EntryPoint: {:#X}", info.lpBaseOfDll as u64, info.SizeOfImage, info.EntryPoint as u64);
+
+			println!("scanning...");
+			//scan_pattern(process, info.lpBaseOfDll, info.SizeOfImage as usize, &pattern);
+			if let Some(addr) = scan_pattern(process, 0 as *const c_void, 0x7fffffffffffffff, &pattern) {
+				println!("pattern found, nopping...");
+				nop_memory(process, addr as *mut c_void, pattern.len());
+			} else {
+				println!("pattern was not found");
+			}
+
+			handleapi::CloseHandle(process);
 		}
-
-		handleapi::CloseHandle(process);
+	} else {
+		println!("did not find {}", process_name);
 	}
 
 	println!("done");
+
+	let _ = std::process::Command::new("cmd.exe").arg("/c").arg("pause").status();
 }
