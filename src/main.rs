@@ -216,7 +216,7 @@ fn main() {
 	if let Some(process_id) = find_process_id_by_name(process_name) {
 		println!("found process id {}", process_id);
 
-		let pattern = [0x80, 0xBE, 0x52, 0x01, 0x00, 0x00, 0x00];
+		let pattern = [0x80, 0xBE, 0x56, 0x01, 0x00, 0x00, 0x00];
 
 		unsafe {
 			let process = processthreadsapi::OpenProcess(winnt::PROCESS_ALL_ACCESS, false as BOOL, process_id);
