@@ -1,6 +1,6 @@
 Simple mod for Terraria that removes the need to click repeatly to attack with weapons (AKA auto-reuse)
 
-Works with latest Windows version 1.4.1.1.
+Works with latest Windows version 1.4.2.3.
 You can download it from here: https://github.com/UnTraDe/terraria-autoswing/releases/latest
 
 Works on both mutliplayer and singleplayer, no need to install on server-side.
